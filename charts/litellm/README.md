@@ -1,6 +1,6 @@
 # litellm
 
-![Version: 1.72.2](https://img.shields.io/badge/Version-1.72.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.72.2-stable](https://img.shields.io/badge/AppVersion-v1.72.2--stable-informational?style=flat-square)
+![Version: 0.0.0](https://img.shields.io/badge/Version-0.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.75.5-stable](https://img.shields.io/badge/AppVersion-v1.75.5--stable-informational?style=flat-square)
 
 The 'litellm' chart provides a solution for deploying LiteLLM proxy with helm.
 
@@ -12,7 +12,7 @@ The chart version is synced with the app version.
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| unique-ag |  | <https://unique.ch/> |
+| Richardo-C |  | <https://github.com/RichardoC> |
 
 ## Values
 
@@ -30,6 +30,7 @@ The chart version is synced with the app version.
 | fullnameOverride | string | `""` |  |
 | hooks.migration.command | string | `"python litellm/proxy/prisma_migration.py\n"` |  |
 | hooks.migration.enabled | bool | `true` |  |
+| hooks.migration.resources | object | `{}` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/berriai/litellm-database"` |  |
 | image.tag | string | `""` |  |
@@ -46,6 +47,8 @@ The chart version is synced with the app version.
 | nameOverride | string | `"litellm"` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
+| podDisruptionBudget.create | bool | `false` |  |
+| podDisruptionBudget.minAvailable | int | `1` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
 | proxy_config.general_settings.alerting | list | `[]` |  |
