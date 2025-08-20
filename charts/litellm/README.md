@@ -30,6 +30,7 @@ The chart version is synced with the app version.
 | fullnameOverride | string | `""` |  |
 | hooks.migration.command | string | `"python litellm/proxy/prisma_migration.py\n"` |  |
 | hooks.migration.enabled | bool | `true` |  |
+| hooks.migration.resources | object | `{}` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/berriai/litellm-database"` |  |
 | image.tag | string | `""` |  |
@@ -46,6 +47,8 @@ The chart version is synced with the app version.
 | nameOverride | string | `"litellm"` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
+| podDisruptionBudget.create | bool | `false` |  |
+| podDisruptionBudget.minAvailable | int | `1` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
 | proxy_config.general_settings.alerting | list | `[]` |  |
