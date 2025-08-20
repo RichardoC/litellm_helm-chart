@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache License 2.0
 # SPDX-SnippetCopyrightText: 2024 © Argo Project, argoproj/argo-helm
 # SPDX-SnippetCopyrightText: 2024 © Unique AG
+# SPDX-SnippetCopyrightText: 2025 © Richard Tweed
 # SPDX-SnippetEnd
 ## Reference: https://github.com/helm/chart-releaser-action
 name: "[charts] Publish"
@@ -18,19 +19,19 @@ permissions:
 
 jobs:
   publish:
-    if: github.repository == 'unique-ag/helm-charts'
+    if: github.repository == 'RichardoC/litellm_helm-chart'
     permissions:
-      contents: write  # for helm/chart-releaser-action to push chart release and create a release
-      packages: write  # to push OCI chart package to GitHub Registry
+      contents: write # for helm/chart-releaser-action to push chart release and create a release
+      packages: write # to push OCI chart package to GitHub Registry
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # tag v5.0.0
         with:
           fetch-depth: 0
 
       - name: Install Helm
-        uses: azure/setup-helm@fe7b79cd5ee1e45176fcad797de68ecaf3ca4814 # v4.2.0
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # tag v4.3.1
         with:
           version: v3.10.1 # Also update in lint-and-test.yaml
 
@@ -64,7 +65,7 @@ jobs:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Login to GHCR
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # tag v3.5.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
