@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache License 2.0
 # SPDX-SnippetCopyrightText: 2024 © Argo Project, argoproj/argo-helm
 # SPDX-SnippetCopyrightText: 2024 © Unique AG
+# SPDX-SnippetCopyrightText: 2025 © Richard Tweed
 # SPDX-SnippetEnd
 ---
 rules:
