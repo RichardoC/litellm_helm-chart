@@ -87,7 +87,7 @@ spec:
       volumes:
         - name: litellm-config
           configMap:
-            name: {{ include "litellm.fullname" . }}-config
+            name: {{ include "litellm.configConfigMapName" . }}
             items:
               - key: config.yaml
                 path: config.yaml
