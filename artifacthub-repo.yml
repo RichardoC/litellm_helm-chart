@@ -12,6 +12,3 @@
 repositoryID: 1f9d66ce-0d8a-4cf9-8b36-1a031b8bbbd8
 owners: # (optional, used to claim repository ownership)
   - name: "Richard Tweed"
-    email: richard.tweed@gmail.com
-  # - name: user2
-  #   email: RichardoC@users.noreply.github.com
