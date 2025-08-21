@@ -1,24 +1,42 @@
 apiVersion: v1
 entries:
   litellm:
-    - annotations:
-        artifacthub.io/changes: |
-          - kind: changed
-            description: Updated litellm version to v1.75.5-stable
-      apiVersion: v2
-      appVersion: v1.75.5-stable
-      created: "2025-08-20T13:15:36.859613511Z"
-      description:
-        "The 'litellm' chart provides a solution for deploying LiteLLM
-        proxy with helm.  It is a refined version of the original [litellm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
-        chart.  The chart version is synced with the app version. "
-      digest: 832e15595e53e19800433a6b1b4b549613d83950d5dd589c67329dfe034b9015
-      maintainers:
-        - name: Richardo-C
-          url: https://github.com/RichardoC
-      name: litellm
-      type: application
-      urls:
-        - https://github.com/RichardoC/litellm_helm-chart/releases/download/litellm-0.0.1/litellm-0.0.1.tgz
-      version: 0.0.1
-generated: "2025-08-20T13:15:36.859637095Z"
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: Use configmap hash in name to ensure old replicasets keep working for rollbacks.
+    apiVersion: v2
+    appVersion: v1.75.5-stable
+    created: "2025-08-21T10:16:31.061925301Z"
+    description: 'The ''litellm'' chart provides a solution for deploying LiteLLM
+      proxy with helm.  It is a refined version of the original [litellm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
+      chart.  The chart version is synced with the app version. '
+    digest: 306df7516dceb1dc5494d8195f58dcbb361010163adeab021510bc1496c627db
+    maintainers:
+    - name: Richardo-C
+      url: https://github.com/RichardoC
+    name: litellm
+    type: application
+    urls:
+    - https://github.com/RichardoC/litellm_helm-chart/releases/download/litellm-0.0.2/litellm-0.0.2.tgz
+    version: 0.0.2
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: Updated litellm version to v1.75.5-stable
+    apiVersion: v2
+    appVersion: v1.75.5-stable
+    created: "2025-08-20T13:15:36.859613511Z"
+    description: 'The ''litellm'' chart provides a solution for deploying LiteLLM
+      proxy with helm.  It is a refined version of the original [litellm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
+      chart.  The chart version is synced with the app version. '
+    digest: 832e15595e53e19800433a6b1b4b549613d83950d5dd589c67329dfe034b9015
+    maintainers:
+    - name: Richardo-C
+      url: https://github.com/RichardoC
+    name: litellm
+    type: application
+    urls:
+    - https://github.com/RichardoC/litellm_helm-chart/releases/download/litellm-0.0.1/litellm-0.0.1.tgz
+    version: 0.0.1
+generated: "2025-08-21T10:16:31.061933156Z"
