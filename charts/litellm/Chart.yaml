@@ -4,7 +4,7 @@ maintainers:
   - name: Richardo-C
     url: https://github.com/RichardoC
 type: application
-version: 0.0.1
+version: 0.0.2
 appVersion: v1.75.5-stable
 description: |
   The 'litellm' chart provides a solution for deploying LiteLLM proxy with helm.
@@ -15,4 +15,4 @@ description: |
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: Updated litellm version to v1.75.5-stable
+      description: Use configmap hash in name to ensure old replicasets keep working for rollbacks.

@@ -60,3 +60,11 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the name of the config configmap with hash suffix
+*/}}
+{{- define "litellm.configConfigMapName" -}}
+{{- $configContent := .Values.proxy_config | toYaml | sha256sum | trunc 8 | trimSuffix "-" }}
+{{- printf "%s-config-%s" (include "litellm.fullname" .) $configContent }}
+{{- end }}
