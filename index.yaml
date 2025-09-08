@@ -4,6 +4,25 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
+          description: add preStop hook to ensure llm calls finished until upstream bug fixed
+    apiVersion: v2
+    appVersion: v1.75.5-stable
+    created: "2025-09-08T16:03:32.030510947Z"
+    description: 'The ''litellm'' chart provides a solution for deploying LiteLLM
+      proxy with helm.  It is a refined version of the original [litellm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
+      chart. '
+    digest: 2016eaa1702a8883e384731e6031f73dd8ef823b1ddd2f9a6fc188d126116288
+    maintainers:
+    - name: Richardo-C
+      url: https://github.com/RichardoC
+    name: litellm
+    type: application
+    urls:
+    - https://github.com/RichardoC/litellm_helm-chart/releases/download/litellm-0.0.3/litellm-0.0.3.tgz
+    version: 0.0.3
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
           description: Use configmap hash in name to ensure old replicasets keep working for rollbacks.
     apiVersion: v2
     appVersion: v1.75.5-stable
@@ -39,4 +58,4 @@ entries:
     urls:
     - https://github.com/RichardoC/litellm_helm-chart/releases/download/litellm-0.0.1/litellm-0.0.1.tgz
     version: 0.0.1
-generated: "2025-08-21T10:16:31.061933156Z"
+generated: "2025-09-08T16:03:32.030523041Z"
