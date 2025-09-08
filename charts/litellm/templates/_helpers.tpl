@@ -68,3 +68,17 @@ Create the name of the config configmap with hash suffix
 {{- $configContent := .Values.proxy_config | toYaml | sha256sum | trunc 8 | trimSuffix "-" }}
 {{- printf "%s-config-%s" (include "litellm.fullname" .) $configContent }}
 {{- end }}
+
+{{/*
+Calculate the sleep duration for preStop hook
+*/}}
+{{- define "litellm.sleepDuration" -}}
+{{- .Values.proxy_config.litellm_settings.request_timeout | default 60 | mul 1.1 | int }}
+{{- end }}
+
+{{/*
+Calculate the termination grace period (1.2 times the sleep duration)
+*/}}
+{{- define "litellm.terminationGracePeriod" -}}
+{{- include "litellm.sleepDuration" . | mul 1.2 | int }}
+{{- end }}
