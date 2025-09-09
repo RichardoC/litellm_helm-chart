@@ -4,7 +4,7 @@ maintainers:
   - name: Richardo-C
     url: https://github.com/RichardoC
 type: application
-version: 0.0.3
+version: 0.0.4
 appVersion: v1.75.5-stable
 description: |
   The 'litellm' chart provides a solution for deploying LiteLLM proxy with helm.
@@ -13,4 +13,4 @@ description: |
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: add preStop hook to ensure llm calls finished until upstream bug fixed
+      description: all surge of 100 percent during rollout, to mitigate the slower deployments issue
