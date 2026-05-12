@@ -30,6 +30,16 @@ podDisruptionBudget:
   create: false
   minAvailable: 1
 
+# Deployment strategy. Use Recreate when mounting RWO (ReadWriteOnce) volumes
+# to avoid multi-attach errors during rollouts — RollingUpdate would attempt to
+# bind the volume to the new pod while the old pod still holds it.
+# type: RollingUpdate | Recreate
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 100%
+    maxUnavailable: 0
+
 # Default environment variables for the proxy. They are put into the environment configMap.
 env:
   LITELLM_LOG: "ERROR"
