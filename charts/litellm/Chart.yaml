@@ -14,3 +14,5 @@ annotations:
   artifacthub.io/changes: |
     - kind: added
       description: configDirExtraFiles to ship custom files (e.g. callback/hook .py modules) into the proxy config directory /etc/litellm via a chart-managed ConfigMap projected alongside config.yaml, with automatic Deployment rollout on change
+    - kind: added
+      description: startupProbe to gate liveness/readiness during slow container startup, defaulting to a 3-minute window

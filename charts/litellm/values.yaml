@@ -92,6 +92,12 @@ readinessProbe:
   httpGet:
     path: /health/readiness
     port: http
+startupProbe:
+  httpGet:
+    path: /health/readiness
+    port: http
+  failureThreshold: 18
+  periodSeconds: 10
 
 autoscaling:
   enabled: false
