@@ -4,7 +4,7 @@ maintainers:
   - name: Richardo-C
     url: https://github.com/RichardoC
 type: application
-version: 0.0.4
+version: 0.1.0
 appVersion: v1.75.5-stable
 description: |
   The 'litellm' chart provides a solution for deploying LiteLLM proxy with helm.
@@ -12,5 +12,5 @@ description: |
   It is a refined version of the original [litellm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm) chart.
 annotations:
   artifacthub.io/changes: |
-    - kind: changed
-      description: all surge of 100 percent during rollout, to mitigate the slower deployments issue
+    - kind: added
+      description: configDirExtraConfigMaps to merge extra ConfigMap sources (e.g. custom callback .py files) into the proxy config directory /etc/litellm via a projected volume

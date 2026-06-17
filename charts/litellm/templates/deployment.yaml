@@ -98,11 +98,21 @@ spec:
             {{- end }}
       volumes:
         - name: litellm-config
-          configMap:
-            name: {{ include "litellm.configConfigMapName" . }}
-            items:
-              - key: config.yaml
-                path: config.yaml
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "litellm.configConfigMapName" . }}
+                  items:
+                    - key: config.yaml
+                      path: config.yaml
+              {{- range .Values.configDirExtraConfigMaps }}
+              - configMap:
+                  name: {{ .name }}
+                  {{- with .items }}
+                  items:
+                    {{- toYaml . | nindent 20 }}
+                  {{- end }}
+              {{- end }}
         {{ if .Values.securityContext.readOnlyRootFilesystem }}
         - name: tmp
           emptyDir:

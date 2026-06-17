@@ -1,6 +1,6 @@
 # litellm
 
-![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.75.5-stable](https://img.shields.io/badge/AppVersion-v1.75.5--stable-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.75.5-stable](https://img.shields.io/badge/AppVersion-v1.75.5--stable-informational?style=flat-square)
 
 The 'litellm' chart provides a solution for deploying LiteLLM proxy with helm.
 
@@ -21,6 +21,7 @@ It is a refined version of the original [litellm](https://github.com/BerriAI/lit
 | autoscaling.maxReplicas | int | `10` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| configDirExtraConfigMaps | list | `[]` | Additional ConfigMap sources merged into the proxy config directory (/etc/litellm) alongside config.yaml. Use this to ship custom callback/hook .py files referenced from litellm_settings.callbacks — LiteLLM resolves those modules relative to the config file's directory. Mounted via a projected volume, so no extra mount paths are needed. Each entry references an existing ConfigMap by name; create that ConfigMap separately. |
 | env.LITELLM_LOG | string | `"ERROR"` |  |
 | env.LITELLM_MODE | string | `"PRODUCTION"` |  |
 | envFromSecretRefs | list | `[]` | List of secrets to be used as environment variables for the proxy |

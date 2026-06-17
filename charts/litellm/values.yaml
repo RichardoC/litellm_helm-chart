@@ -111,6 +111,18 @@ volumeMounts: []
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
+# -- Additional ConfigMap sources merged into the proxy config directory
+# (/etc/litellm) alongside config.yaml. Use this to ship custom callback/hook
+# .py files referenced from litellm_settings.callbacks — LiteLLM resolves those
+# modules relative to the config file's directory. Mounted via a projected
+# volume, so no extra mount paths are needed. Each entry references an existing
+# ConfigMap by name; create that ConfigMap separately.
+configDirExtraConfigMaps: []
+#  - name: litellm-callbacks
+#    items:
+#      - key: my_handler.py
+#        path: my_handler.py
+
 nodeSelector: {}
 
 tolerations: []

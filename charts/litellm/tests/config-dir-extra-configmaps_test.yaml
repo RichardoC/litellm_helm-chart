@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Test configDirExtraConfigMaps
+templates:
+  - deployment.yaml
+  - config.yaml
+  - environment.yaml
+  - extra-manifests.yaml
+release:
+  name: lite11m
+tests:
+  - it: By default the litellm-config volume is a projected volume with a single config.yaml source
+    template: deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected
+      - notExists:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].configMap
+      - lengthEqual:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources
+          count: 1
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources[0].configMap.items[0].path
+          value: config.yaml
+
+  - it: When given extra ConfigMap sources, merges them into the projected config volume
+    template: deployment.yaml
+    set:
+      configDirExtraConfigMaps:
+        - name: litellm-callbacks
+          items:
+            - key: my_handler.py
+              path: my_handler.py
+    asserts:
+      - isKind:
+          of: Deployment
+      - lengthEqual:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources
+          count: 2
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources[1].configMap.name
+          value: litellm-callbacks
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources[1].configMap.items[0].path
+          value: my_handler.py
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "litellm")].volumeMounts[?(@.name == "litellm-config")].mountPath
+          value: /etc/litellm/
