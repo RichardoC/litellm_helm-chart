@@ -3,6 +3,25 @@ entries:
   litellm:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: configDirExtraFiles to ship custom files (e.g. callback/hook .py modules) into the proxy config directory /etc/litellm via a chart-managed ConfigMap projected alongside config.yaml, with automatic Deployment rollout on change
+    apiVersion: v2
+    appVersion: v1.75.5-stable
+    created: "2026-06-17T14:32:37.567741387Z"
+    description: 'The ''litellm'' chart provides a solution for deploying LiteLLM
+      proxy with helm.  It is a refined version of the original [litellm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
+      chart. '
+    digest: fabad2030a26c222f3b51d351d0cd9b1c3333a8d8011dc91c6b7b2fbfbaa9588
+    maintainers:
+    - name: Richardo-C
+      url: https://github.com/RichardoC
+    name: litellm
+    type: application
+    urls:
+    - https://github.com/RichardoC/litellm_helm-chart/releases/download/litellm-0.1.0/litellm-0.1.0.tgz
+    version: 0.1.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: all surge of 100 percent during rollout, to mitigate the slower deployments issue
     apiVersion: v2
@@ -77,4 +96,4 @@ entries:
     urls:
     - https://github.com/RichardoC/litellm_helm-chart/releases/download/litellm-0.0.1/litellm-0.0.1.tgz
     version: 0.0.1
-generated: "2025-09-09T11:59:32.098799673Z"
+generated: "2026-06-17T14:32:37.567763097Z"
