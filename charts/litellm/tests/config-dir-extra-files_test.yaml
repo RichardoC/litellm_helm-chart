@@ -1,8 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
-suite: Test configDirExtraConfigMaps
+suite: Test configDirExtraFiles
 templates:
   - deployment.yaml
   - config.yaml
+  - config-dir-extra.yaml
   - environment.yaml
   - extra-manifests.yaml
 release:
@@ -26,23 +27,27 @@ tests:
       - notExists:
           path: spec.template.metadata.annotations["checksum/config-dir-extra"]
 
-  - it: When given extra ConfigMap sources, merges them into the projected config volume
+  - it: By default no extra config-dir ConfigMap is rendered
+    template: config-dir-extra.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: When given extra files, projects a chart-created ConfigMap into the config volume
     template: deployment.yaml
     set:
-      configDirExtraConfigMaps:
-        - name: litellm-callbacks
-          items:
-            - key: my_handler.py
-              path: my_handler.py
+      configDirExtraFiles:
+        my_handler.py: |
+          proxy_handler_instance = object()
     asserts:
       - isKind:
           of: Deployment
       - lengthEqual:
           path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources
           count: 2
-      - equal:
+      - matchRegex:
           path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources[1].configMap.name
-          value: litellm-callbacks
+          pattern: ^lite11m-litellm-config-extra-[a-f0-9]+$
       - equal:
           path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources[1].configMap.items[0].path
           value: my_handler.py
@@ -51,3 +56,20 @@ tests:
           value: /etc/litellm/
       - isNotNullOrEmpty:
           path: spec.template.metadata.annotations["checksum/config-dir-extra"]
+
+  - it: When given extra files, renders them into a ConfigMap
+    template: config-dir-extra.yaml
+    set:
+      configDirExtraFiles:
+        my_handler.py: |
+          proxy_handler_instance = object()
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: metadata.name
+          pattern: ^lite11m-litellm-config-extra-[a-f0-9]+$
+      - equal:
+          path: data["my_handler.py"]
+          value: |
+            proxy_handler_instance = object()

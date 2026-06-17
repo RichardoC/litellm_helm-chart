@@ -70,24 +70,12 @@ Create the name of the config configmap with hash suffix
 {{- end }}
 
 {{/*
-Checksum of the extra config-dir ConfigMap sources, used as a pod annotation so
-the Deployment rolls out when the projected ConfigMaps change.
-
-It folds in both the referenced set (names/items from values) and the live
-contents of those ConfigMaps. Contents are read via `lookup`, which only
-resolves against a live cluster (helm install/upgrade). Under `helm template`,
-`--dry-run`, or tooling that disables lookups (e.g. some GitOps dry-runs) the
-content portion is empty, so there a content-only change will not be detected.
+Create the name of the extra config-dir configmap with hash suffix, so the
+Deployment rolls out when the projected files change.
 */}}
-{{- define "litellm.configDirExtraChecksum" -}}
-{{- $parts := list (.Values.configDirExtraConfigMaps | toYaml) -}}
-{{- range .Values.configDirExtraConfigMaps -}}
-{{- $cm := lookup "v1" "ConfigMap" $.Release.Namespace .name -}}
-{{- if $cm -}}
-{{- $parts = append $parts (printf "%s/%s=%s" $.Release.Namespace .name (toYaml ($cm.data | default dict))) -}}
-{{- end -}}
-{{- end -}}
-{{- $parts | join "\n" | sha256sum -}}
+{{- define "litellm.configDirExtraConfigMapName" -}}
+{{- $content := .Values.configDirExtraFiles | toYaml | sha256sum | trunc 8 | trimSuffix "-" }}
+{{- printf "%s-config-extra-%s" (include "litellm.fullname" .) $content }}
 {{- end }}
 
 {{/*

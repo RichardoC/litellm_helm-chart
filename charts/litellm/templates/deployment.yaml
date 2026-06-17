@@ -23,8 +23,8 @@ spec:
         {{- if .Values.extraObjects }}
         checksum/extra-manifests: {{ include (print $.Template.BasePath "/extra-manifests.yaml") . | sha256sum }}
         {{- end }}
-        {{- if .Values.configDirExtraConfigMaps }}
-        checksum/config-dir-extra: {{ include "litellm.configDirExtraChecksum" . }}
+        {{- if .Values.configDirExtraFiles }}
+        checksum/config-dir-extra: {{ include (print $.Template.BasePath "/config-dir-extra.yaml") . | sha256sum }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
@@ -108,13 +108,14 @@ spec:
                   items:
                     - key: config.yaml
                       path: config.yaml
-              {{- range .Values.configDirExtraConfigMaps }}
+              {{- if .Values.configDirExtraFiles }}
               - configMap:
-                  name: {{ .name }}
-                  {{- with .items }}
+                  name: {{ include "litellm.configDirExtraConfigMapName" . }}
                   items:
-                    {{- toYaml . | nindent 20 }}
-                  {{- end }}
+                    {{- range $filename, $contents := .Values.configDirExtraFiles }}
+                    - key: {{ $filename }}
+                      path: {{ $filename }}
+                    {{- end }}
               {{- end }}
         {{ if .Values.securityContext.readOnlyRootFilesystem }}
         - name: tmp

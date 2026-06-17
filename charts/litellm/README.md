@@ -14,22 +14,30 @@ It is a refined version of the original [litellm](https://github.com/BerriAI/lit
 
 ## Custom callbacks / extra files in the config directory
 
-LiteLLM resolves callback modules referenced in `litellm_settings.callbacks` relative to the directory containing `config.yaml` (i.e. `/etc/litellm`). This chart mounts `/etc/litellm` as a projected volume, so you can merge extra ConfigMap sources into the same directory without adding extra `volumeMounts`.
+LiteLLM resolves callback modules referenced in `litellm_settings.callbacks` relative to the directory containing `config.yaml` (i.e. `/etc/litellm`). To ship custom hook/handler `.py` files, set `configDirExtraFiles` (keyed by filename). The chart renders them into a ConfigMap (with a content-hashed name) and projects it into `/etc/litellm` alongside `config.yaml`, so no extra `volumeMounts` are needed, and any change rolls out the Deployment automatically.
 
-Create a ConfigMap with your callback file(s), then reference it via `configDirExtraConfigMaps`:
+You almost certainly don't want Python source inlined in your YAML. Keep each handler as a real `.py` file and load it at install time with Helm's `--set-file`, which reads the file's contents into the value:
+
+```console
+$ helm upgrade --install litellm oci://ghcr.io/richardoc/litellm_helm-chart/litellm \
+    --values values.yaml \
+    --set-file 'configDirExtraFiles.my_handler\.py=./hooks/my_handler.py'
+```
+
+Then reference the module from your config:
 
 ```yaml
-configDirExtraConfigMaps:
-  - name: litellm-callbacks
-    items:
-      - key: my_handler.py
-        path: my_handler.py
+proxy_config:
+  litellm_settings:
+    callbacks: ["my_handler.proxy_handler_instance"]
 ```
+
+`--set-file` also works through orchestrators that pass Helm flags — e.g. Tilt's [`helm_resource`](https://github.com/tilt-dev/tilt-extensions/tree/master/helm_resource) via `flags=['--set-file', 'configDirExtraFiles.my_handler\\.py=./hooks/my_handler.py']`. (Inlining the contents directly under `configDirExtraFiles` in a values file is also supported, e.g. for tooling that can't pass `--set-file`.)
 
 **Notes:**
 
-- The `path` values must not collide with `config.yaml` or with each other. If two sources target the same path, the pod will fail to be created.
-- These ConfigMaps are created and managed separately from this chart. Their contents are folded into a `checksum/config-dir-extra` pod annotation (read via `lookup`), so `helm upgrade` rolls out the Deployment when they change. Where `lookup` is unavailable (e.g. `helm template`/`--dry-run`, or GitOps tooling that disables it) a content-only change is not detected — use a reloader or roll out the Deployment manually in that case.
+- Filenames must not collide with `config.yaml`.
+- The rendered files are folded into a `checksum/config-dir-extra` pod annotation (and the ConfigMap name is content-hashed), so changing them rolls out the Deployment automatically.
 
 ## Values
 
@@ -40,7 +48,7 @@ configDirExtraConfigMaps:
 | autoscaling.maxReplicas | int | `10` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| configDirExtraConfigMaps | list | `[]` | Additional ConfigMap sources merged into the proxy config directory (/etc/litellm) alongside config.yaml. Use this to ship custom callback/hook .py files referenced from litellm_settings.callbacks — LiteLLM resolves those modules relative to the config file's directory. Mounted via a projected volume, so no extra mount paths are needed. Each entry references an existing ConfigMap by name; create that ConfigMap separately. Avoid path collisions: the projected `path` values must not collide with `config.yaml` or each other, or the pod will fail to start. Changes to these ConfigMaps are folded into a `checksum/config-dir-extra` pod annotation (their contents are read via `lookup`), so `helm upgrade` rolls out the Deployment when they change — except where `lookup` is unavailable (e.g. `helm template`/`--dry-run` or GitOps tools that disable it), in which case use a reloader or roll out manually. |
+| configDirExtraFiles | object | `{}` | Custom files to drop into the proxy config directory (/etc/litellm) alongside config.yaml — e.g. callback/hook .py modules referenced from litellm_settings.callbacks. LiteLLM resolves those modules relative to the config file's directory, so they must live next to config.yaml. Keys are filenames, values are the file contents. The chart renders these into a ConfigMap (content-hashed name) and projects it into /etc/litellm (no extra mount paths needed), and folds their contents into a `checksum/config-dir-extra` pod annotation, so changes roll out the Deployment automatically. Filenames must not collide with `config.yaml`. Rather than inlining source here, prefer keeping each handler as a real file and loading it at install time with `helm --set-file 'configDirExtraFiles.my_handler\.py=./hooks/my_handler.py'`. |
 | env.LITELLM_LOG | string | `"ERROR"` |  |
 | env.LITELLM_MODE | string | `"PRODUCTION"` |  |
 | envFromSecretRefs | list | `[]` | List of secrets to be used as environment variables for the proxy |

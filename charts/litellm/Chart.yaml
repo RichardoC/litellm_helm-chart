@@ -13,6 +13,4 @@ description: |
 annotations:
   artifacthub.io/changes: |
     - kind: added
-      description: configDirExtraConfigMaps to merge extra ConfigMap sources (e.g. custom callback .py files) into the proxy config directory /etc/litellm via a projected volume
-    - kind: added
-      description: checksum/config-dir-extra pod annotation so the Deployment rolls out when the extra config-dir ConfigMaps change
+      description: configDirExtraFiles to ship custom files (e.g. callback/hook .py modules) into the proxy config directory /etc/litellm via a chart-managed ConfigMap projected alongside config.yaml, with automatic Deployment rollout on change
