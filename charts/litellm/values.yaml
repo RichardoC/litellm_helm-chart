@@ -111,6 +111,26 @@ volumeMounts: []
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
+# -- Custom files to drop into the proxy config directory (/etc/litellm)
+# alongside config.yaml — e.g. callback/hook .py modules referenced from
+# litellm_settings.callbacks. LiteLLM resolves those modules relative to the
+# config file's directory, so they must live next to config.yaml. Keys are
+# filenames, values are the file contents. The chart renders these into a
+# ConfigMap (content-hashed name) and projects it into /etc/litellm (no extra
+# mount paths needed), and folds their contents into a `checksum/config-dir-extra`
+# pod annotation, so changes roll out the Deployment automatically. Filenames
+# must not collide with `config.yaml`. Rather than inlining source here, prefer
+# keeping each handler as a real file and loading it at install time with
+# `helm --set-file 'configDirExtraFiles.my_handler\.py=./hooks/my_handler.py'`.
+configDirExtraFiles: {}
+#  my_handler.py: |
+#    from litellm.integrations.custom_logger import CustomLogger
+#
+#    class MyHandler(CustomLogger):
+#        pass
+#
+#    proxy_handler_instance = MyHandler()
+
 nodeSelector: {}
 
 tolerations: []

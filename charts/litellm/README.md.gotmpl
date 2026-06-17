@@ -1,0 +1,45 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+## Custom callbacks / extra files in the config directory
+
+LiteLLM resolves callback modules referenced in `litellm_settings.callbacks` relative to the directory containing `config.yaml` (i.e. `/etc/litellm`). To ship custom hook/handler `.py` files, set `configDirExtraFiles` (keyed by filename). The chart renders them into a ConfigMap (with a content-hashed name) and projects it into `/etc/litellm` alongside `config.yaml`, so no extra `volumeMounts` are needed, and any change rolls out the Deployment automatically.
+
+You almost certainly don't want Python source inlined in your YAML. Keep each handler as a real `.py` file and load it at install time with Helm's `--set-file`, which reads the file's contents into the value:
+
+```console
+$ helm upgrade --install litellm oci://ghcr.io/richardoc/litellm_helm-chart/litellm \
+    --values values.yaml \
+    --set-file 'configDirExtraFiles.my_handler\.py=./hooks/my_handler.py'
+```
+
+Then reference the module from your config:
+
+```yaml
+proxy_config:
+  litellm_settings:
+    callbacks: ["my_handler.proxy_handler_instance"]
+```
+
+`--set-file` also works through orchestrators that pass Helm flags — e.g. Tilt's [`helm_resource`](https://github.com/tilt-dev/tilt-extensions/tree/master/helm_resource) via `flags=['--set-file', 'configDirExtraFiles.my_handler\\.py=./hooks/my_handler.py']`. (Inlining the contents directly under `configDirExtraFiles` in a values file is also supported, e.g. for tooling that can't pass `--set-file`.)
+
+**Notes:**
+
+- Filenames must not collide with `config.yaml`.
+- The rendered files are folded into a `checksum/config-dir-extra` pod annotation (and the ConfigMap name is content-hashed), so changing them rolls out the Deployment automatically.
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

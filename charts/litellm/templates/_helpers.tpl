@@ -70,6 +70,15 @@ Create the name of the config configmap with hash suffix
 {{- end }}
 
 {{/*
+Create the name of the extra config-dir configmap with hash suffix, so the
+Deployment rolls out when the projected files change.
+*/}}
+{{- define "litellm.configDirExtraConfigMapName" -}}
+{{- $content := .Values.configDirExtraFiles | toYaml | sha256sum | trunc 8 | trimSuffix "-" }}
+{{- printf "%s-config-extra-%s" (include "litellm.fullname" .) $content }}
+{{- end }}
+
+{{/*
 Calculate the sleep duration for preStop hook
 */}}
 {{- define "litellm.sleepDuration" -}}

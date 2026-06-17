@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Test configDirExtraFiles
+templates:
+  - deployment.yaml
+  - config.yaml
+  - config-dir-extra.yaml
+  - environment.yaml
+  - extra-manifests.yaml
+release:
+  name: lite11m
+tests:
+  - it: By default the litellm-config volume is a projected volume with a single config.yaml source
+    template: deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected
+      - notExists:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].configMap
+      - lengthEqual:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources
+          count: 1
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources[0].configMap.items[0].path
+          value: config.yaml
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/config-dir-extra"]
+
+  - it: By default no extra config-dir ConfigMap is rendered
+    template: config-dir-extra.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: When given extra files, projects a chart-created ConfigMap into the config volume
+    template: deployment.yaml
+    set:
+      configDirExtraFiles:
+        my_handler.py: |
+          proxy_handler_instance = object()
+    asserts:
+      - isKind:
+          of: Deployment
+      - lengthEqual:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources
+          count: 2
+      - matchRegex:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources[1].configMap.name
+          pattern: ^lite11m-litellm-config-extra-[a-f0-9]+$
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "litellm-config")].projected.sources[1].configMap.items[0].path
+          value: my_handler.py
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "litellm")].volumeMounts[?(@.name == "litellm-config")].mountPath
+          value: /etc/litellm/
+      - isNotNullOrEmpty:
+          path: spec.template.metadata.annotations["checksum/config-dir-extra"]
+
+  - it: When given extra files, renders them into a ConfigMap
+    template: config-dir-extra.yaml
+    set:
+      configDirExtraFiles:
+        my_handler.py: |
+          proxy_handler_instance = object()
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: metadata.name
+          pattern: ^lite11m-litellm-config-extra-[a-f0-9]+$
+      - equal:
+          path: data["my_handler.py"]
+          value: |
+            proxy_handler_instance = object()

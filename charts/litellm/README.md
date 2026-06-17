@@ -1,6 +1,6 @@
 # litellm
 
-![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.75.5-stable](https://img.shields.io/badge/AppVersion-v1.75.5--stable-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.75.5-stable](https://img.shields.io/badge/AppVersion-v1.75.5--stable-informational?style=flat-square)
 
 The 'litellm' chart provides a solution for deploying LiteLLM proxy with helm.
 
@@ -12,6 +12,33 @@ It is a refined version of the original [litellm](https://github.com/BerriAI/lit
 | ---- | ------ | --- |
 | Richardo-C |  | <https://github.com/RichardoC> |
 
+## Custom callbacks / extra files in the config directory
+
+LiteLLM resolves callback modules referenced in `litellm_settings.callbacks` relative to the directory containing `config.yaml` (i.e. `/etc/litellm`). To ship custom hook/handler `.py` files, set `configDirExtraFiles` (keyed by filename). The chart renders them into a ConfigMap (with a content-hashed name) and projects it into `/etc/litellm` alongside `config.yaml`, so no extra `volumeMounts` are needed, and any change rolls out the Deployment automatically.
+
+You almost certainly don't want Python source inlined in your YAML. Keep each handler as a real `.py` file and load it at install time with Helm's `--set-file`, which reads the file's contents into the value:
+
+```console
+$ helm upgrade --install litellm oci://ghcr.io/richardoc/litellm_helm-chart/litellm \
+    --values values.yaml \
+    --set-file 'configDirExtraFiles.my_handler\.py=./hooks/my_handler.py'
+```
+
+Then reference the module from your config:
+
+```yaml
+proxy_config:
+  litellm_settings:
+    callbacks: ["my_handler.proxy_handler_instance"]
+```
+
+`--set-file` also works through orchestrators that pass Helm flags — e.g. Tilt's [`helm_resource`](https://github.com/tilt-dev/tilt-extensions/tree/master/helm_resource) via `flags=['--set-file', 'configDirExtraFiles.my_handler\\.py=./hooks/my_handler.py']`. (Inlining the contents directly under `configDirExtraFiles` in a values file is also supported, e.g. for tooling that can't pass `--set-file`.)
+
+**Notes:**
+
+- Filenames must not collide with `config.yaml`.
+- The rendered files are folded into a `checksum/config-dir-extra` pod annotation (and the ConfigMap name is content-hashed), so changing them rolls out the Deployment automatically.
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -21,6 +48,7 @@ It is a refined version of the original [litellm](https://github.com/BerriAI/lit
 | autoscaling.maxReplicas | int | `10` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| configDirExtraFiles | object | `{}` | Custom files to drop into the proxy config directory (/etc/litellm) alongside config.yaml — e.g. callback/hook .py modules referenced from litellm_settings.callbacks. LiteLLM resolves those modules relative to the config file's directory, so they must live next to config.yaml. Keys are filenames, values are the file contents. The chart renders these into a ConfigMap (content-hashed name) and projects it into /etc/litellm (no extra mount paths needed), and folds their contents into a `checksum/config-dir-extra` pod annotation, so changes roll out the Deployment automatically. Filenames must not collide with `config.yaml`. Rather than inlining source here, prefer keeping each handler as a real file and loading it at install time with `helm --set-file 'configDirExtraFiles.my_handler\.py=./hooks/my_handler.py'`. |
 | env.LITELLM_LOG | string | `"ERROR"` |  |
 | env.LITELLM_MODE | string | `"PRODUCTION"` |  |
 | envFromSecretRefs | list | `[]` | List of secrets to be used as environment variables for the proxy |

@@ -1,0 +1,13 @@
+{{- if .Values.configDirExtraFiles }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "litellm.configDirExtraConfigMapName" . }}
+  labels:
+    {{- include "litellm.labels" . | nindent 4 }}
+data:
+  {{- range $filename, $contents := .Values.configDirExtraFiles }}
+  {{ $filename }}: |
+{{ $contents | indent 4 }}
+  {{- end }}
+{{- end }}
