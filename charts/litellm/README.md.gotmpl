@@ -1,0 +1,37 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+## Custom callbacks / extra files in the config directory
+
+LiteLLM resolves callback modules referenced in `litellm_settings.callbacks` relative to the directory containing `config.yaml` (i.e. `/etc/litellm`). This chart mounts `/etc/litellm` as a projected volume, so you can merge extra ConfigMap sources into the same directory without adding extra `volumeMounts`.
+
+Create a ConfigMap with your callback file(s), then reference it via `configDirExtraConfigMaps`:
+
+```yaml
+configDirExtraConfigMaps:
+  - name: litellm-callbacks
+    items:
+      - key: my_handler.py
+        path: my_handler.py
+```
+
+**Notes:**
+
+- The `path` values must not collide with `config.yaml` or with each other. If two sources target the same path, the pod will fail to be created.
+- These ConfigMaps are created and managed separately from this chart. Their contents are folded into a `checksum/config-dir-extra` pod annotation (read via `lookup`), so `helm upgrade` rolls out the Deployment when they change. Where `lookup` is unavailable (e.g. `helm template`/`--dry-run`, or GitOps tooling that disables it) a content-only change is not detected — use a reloader or roll out the Deployment manually in that case.
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

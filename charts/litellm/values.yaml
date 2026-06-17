@@ -116,7 +116,14 @@ volumeMounts: []
 # .py files referenced from litellm_settings.callbacks — LiteLLM resolves those
 # modules relative to the config file's directory. Mounted via a projected
 # volume, so no extra mount paths are needed. Each entry references an existing
-# ConfigMap by name; create that ConfigMap separately.
+# ConfigMap by name; create that ConfigMap separately. Avoid path collisions:
+# the projected `path` values must not collide with `config.yaml` or each other,
+# or the pod will fail to start. Changes to these ConfigMaps are folded into a
+# `checksum/config-dir-extra` pod annotation (their contents are read via
+# `lookup`), so `helm upgrade` rolls out the Deployment when they change —
+# except where `lookup` is unavailable (e.g. `helm template`/`--dry-run` or
+# GitOps tools that disable it), in which case use a reloader or roll out
+# manually.
 configDirExtraConfigMaps: []
 #  - name: litellm-callbacks
 #    items:

@@ -23,6 +23,9 @@ spec:
         {{- if .Values.extraObjects }}
         checksum/extra-manifests: {{ include (print $.Template.BasePath "/extra-manifests.yaml") . | sha256sum }}
         {{- end }}
+        {{- if .Values.configDirExtraConfigMaps }}
+        checksum/config-dir-extra: {{ include "litellm.configDirExtraChecksum" . }}
+        {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
