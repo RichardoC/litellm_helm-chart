@@ -4,7 +4,7 @@ maintainers:
   - name: Richardo-C
     url: https://github.com/RichardoC
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: v1.75.5-stable
 description: |
   The 'litellm' chart provides a solution for deploying LiteLLM proxy with helm.
